@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import re
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Tuple
 from typing_extensions import Self
 
 from helpers.parsing import map_lines_with_line_numbers
@@ -81,12 +81,32 @@ class Schematic:
         return schema
 
     def part_numbers(self) -> List[EnginePart]:
-        return [part for part in self.parts if self.is_part_adjacent_to_symbol(part)]
+        return [
+            part
+            for part in self.parts
+            if self.is_part_adjacent_to_positions(part, list(self.symbols))
+        ]
 
-    def is_part_adjacent_to_symbol(self, part: EnginePart) -> bool:
+    @staticmethod
+    def is_part_adjacent_to_positions(part: EnginePart, positions: List[Pos]) -> bool:
         return any(
-            (True for pos in part.surrounding_box_unchecked() if pos in self.symbols)
+            (True for pos in part.surrounding_box_unchecked() if pos in positions)
         )
+
+    def parts_adjacent_to_positions(self, positions: List[Pos]) -> List[EnginePart]:
+        return [
+            part
+            for part in self.parts
+            if self.is_part_adjacent_to_positions(part, positions)
+        ]
+
+    def gears(self) -> List[Tuple[Pos, List[EnginePart]]]:
+        return [
+            (pos, parts)
+            for (pos, sym) in self.symbols.items()
+            if sym == "*"
+            if len(parts := self.parts_adjacent_to_positions([pos])) == 2
+        ]
 
 
 def solve_1():
@@ -94,3 +114,10 @@ def solve_1():
         schema = Schematic.merge(map_lines_with_line_numbers(file, Schematic.from_line))
         valid_part_numbers = [part.value for part in schema.part_numbers()]
         print(f"Day 03 Part 1: {sum(valid_part_numbers)}")
+
+
+def solve_2():
+    with open("day03/input.txt", "r") as file:
+        schema = Schematic.merge(map_lines_with_line_numbers(file, Schematic.from_line))
+        gear_ratios = [parts[0].value * parts[1].value for (_, parts) in schema.gears()]
+        print(f"Day 03 Part 2: {sum(gear_ratios)}")
