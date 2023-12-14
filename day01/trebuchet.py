@@ -34,12 +34,12 @@ def str_to_digit(word: str) -> int:
 
 
 def solve_1():
-    with open("day01/input1.txt", "r") as file:
+    with open("day01/input.txt", "r") as file:
         nums = map_lines(file, double_digits)
         print(f"Day 01 Part 1: {sum(nums)}")
 
 
 def solve_2():
-    with open("day01/input1.txt", "r") as file:
+    with open("day01/input.txt", "r") as file:
         nums = map_lines(file, double_digits_refined)
         print(f"Day 01 Part 2: {sum(nums)}")
