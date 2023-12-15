@@ -43,5 +43,11 @@ class Test(unittest.TestCase):
     def test_ex1(self):
         expected = [82, 43, 86, 35]
         farm = Farm.from_multiline(example_input)
-        actual = farm.seeds_to_location()
+        actual = list(farm.seeds_to_location())
+        self.assertEqual(expected, actual)
+
+    def test_ex2(self):
+        expected = 46
+        farm = Farm.from_multiline(example_input)
+        actual = min(farm.seed_ranges_to_location())
         self.assertEqual(expected, actual)

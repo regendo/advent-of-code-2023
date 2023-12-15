@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 import re
-from typing import List, Optional
+from typing import Generator, List, Optional
 from typing_extensions import Self
 from functools import reduce
 from helpers.parsing import skip_first_line, text
+from helpers.algo import batched
 
 
 @dataclass
@@ -48,8 +49,8 @@ class Farm:
     temperature_to_humidity: List[RangeMap]
     humidity_to_location: List[RangeMap]
 
-    def seeds_to_location(self) -> List[int]:
-        return [
+    def seeds_to_location(self) -> Generator[int, None, None]:
+        return (
             RangeMap.chain_map(
                 seed,
                 [
@@ -63,7 +64,31 @@ class Farm:
                 ],
             )
             for seed in self.seeds
-        ]
+        )
+
+    def seed_ranges_to_location(self) -> Generator[int, None, None]:
+        return (
+            RangeMap.chain_map(
+                seed,
+                [
+                    self.seeds_to_soil,
+                    self.soil_to_fertilizer,
+                    self.fertilizer_to_water,
+                    self.water_to_light,
+                    self.light_to_temperature,
+                    self.temperature_to_humidity,
+                    self.humidity_to_location,
+                ],
+            )
+            for seed in self.seed_ranges()
+        )
+
+    def seed_ranges(self) -> Generator[int, None, None]:
+        return (
+            seed
+            for (start, width) in batched(self.seeds, 2)
+            for seed in range(start, start + width)
+        )
 
     @classmethod
     def from_multiline(cls, text: str) -> Self:
@@ -86,3 +111,10 @@ def solve_1():
         farm = Farm.from_multiline(text(file))
         locations = farm.seeds_to_location()
         print(f"Day 05 Part 1: {min(locations)}")
+
+
+def solve_2():
+    with open("day05/input.txt", "r") as file:
+        farm = Farm.from_multiline(text(file))
+        locations = farm.seed_ranges_to_location()
+        print(f"Day 05 Part 2: {min(locations)}")
