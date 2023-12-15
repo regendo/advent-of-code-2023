@@ -18,3 +18,9 @@ class Test(unittest.TestCase):
         cards = map_lines(example_input, Card.from_line)
         actual = [card.points() for card in cards]
         self.assertEqual(expected, actual)
+
+    def test_ex2(self):
+        expected = [1, 2, 4, 8, 14, 1]
+        cards = map_lines(example_input, Card.from_line)
+        actual = Card.copies_per_card(cards)
+        self.assertEqual(expected, actual)
