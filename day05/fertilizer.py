@@ -53,9 +53,13 @@ class RangeMap:
 
     @classmethod
     def map_range(cls, nums: range, maps: List[Self]) -> List[range]:
-        return [
+        mapped_ranges = [
             mapped for map in maps if (mapped := map.try_map_range(nums)) is not None
         ]
+        if mapped_ranges:
+            return mapped_ranges
+        else:
+            return [nums]
 
     @classmethod
     def chain_map(cls, num: int, maps: List[List[Self]]) -> int:
