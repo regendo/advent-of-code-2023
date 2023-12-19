@@ -27,9 +27,9 @@ class RangeMap:
         last_num = nums.stop - 1
         match (self.try_map(nums.start), self.try_map(last_num)):
             case (int(start), int(stop)):
-                return range(start, stop)
+                return range(start, stop + 1)
             case (None, int(stop)):
-                return range(self.source_start, stop)
+                return range(self.source_start, stop + 1)
             case (int(start), None):
                 return range(start, self.source_stop())
             case (_, _):
@@ -137,7 +137,7 @@ class Farm:
 
 
 def first_num_in_ranges(gen: Generator[range, None, None]) -> int:
-    return min((r.start for r in gen))
+    return min(r.start for r in gen)
 
 
 def solve_1():
