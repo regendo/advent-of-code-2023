@@ -3,5 +3,8 @@
   "python.analysis.typeCheckingMode": "strict",
   "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test_*.py"],
   "python.testing.pytestEnabled": false,
-  "python.testing.unittestEnabled": true
+  "python.testing.unittestEnabled": true,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.analysis.diagnosticMode": "workspace",
+  "cSpell.words": ["Pylance"]
 }
