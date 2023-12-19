@@ -1,6 +1,6 @@
 import unittest
 
-from day05.fertilizer import Farm
+from day05.fertilizer import Farm, first_num_in_ranges
 
 example_input = """
 seeds: 79 14 55 13
@@ -49,5 +49,6 @@ class Test(unittest.TestCase):
     def test_ex2(self):
         expected = 46
         farm = Farm.from_multiline(example_input)
-        actual = min(farm.seed_ranges_to_location())
+        locations = farm.seed_ranges_to_location_ranges()
+        actual = first_num_in_ranges(locations)
         self.assertEqual(expected, actual)

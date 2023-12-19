@@ -13,12 +13,27 @@ class RangeMap:
     dest_start: int
     width: int
 
+    def source_stop(self) -> int:
+        return self.source_start + self.width
+
     def try_map(self, num: int) -> Optional[int]:
         off = num - self.source_start
         if off >= 0 and off < self.width:
             return self.dest_start + off
         else:
             return None
+
+    def try_map_range(self, nums: range) -> Optional[range]:
+        last_num = nums.stop - 1
+        match (self.try_map(nums.start), self.try_map(last_num)):
+            case (int(start), int(stop)):
+                return range(start, stop)
+            case (None, int(stop)):
+                return range(self.source_start, stop)
+            case (int(start), None):
+                return range(start, self.source_stop())
+            case (_, _):
+                return None
 
     @classmethod
     def from_line(cls, line: str) -> Self:
@@ -34,8 +49,28 @@ class RangeMap:
         return num
 
     @classmethod
-    def chain_map(cls, num, maps: List[List[Self]]) -> int:
-        return reduce(lambda n, f: cls.map(n, f), maps, num)
+    def map_range(cls, nums: range, maps: List[Self]) -> List[range]:
+        return [
+            mapped for map in maps if (mapped := map.try_map_range(nums)) is not None
+        ]
+
+    @classmethod
+    def chain_map(cls, num: int, maps: List[List[Self]]) -> int:
+        return reduce(lambda n, fn: cls.map(n, fn), maps, num)
+
+    @classmethod
+    def chain_map_ranges(
+        cls, nums: Generator[range, None, None], maps: List[List[Self]]
+    ) -> Generator[range, None, None]:
+        return reduce(
+            lambda current_ranges, fn: (
+                mapped_range
+                for source_range in current_ranges
+                for mapped_range in cls.map_range(source_range, fn)
+            ),
+            maps,
+            nums,
+        )
 
 
 @dataclass
@@ -66,28 +101,23 @@ class Farm:
             for seed in self.seeds
         )
 
-    def seed_ranges_to_location(self) -> Generator[int, None, None]:
-        return (
-            RangeMap.chain_map(
-                seed,
-                [
-                    self.seeds_to_soil,
-                    self.soil_to_fertilizer,
-                    self.fertilizer_to_water,
-                    self.water_to_light,
-                    self.light_to_temperature,
-                    self.temperature_to_humidity,
-                    self.humidity_to_location,
-                ],
-            )
-            for seed in self.seed_ranges()
+    def seed_ranges_to_location_ranges(self) -> Generator[range, None, None]:
+        return RangeMap.chain_map_ranges(
+            self.seed_ranges(),
+            [
+                self.seeds_to_soil,
+                self.soil_to_fertilizer,
+                self.fertilizer_to_water,
+                self.water_to_light,
+                self.light_to_temperature,
+                self.temperature_to_humidity,
+                self.humidity_to_location,
+            ],
         )
 
-    def seed_ranges(self) -> Generator[int, None, None]:
+    def seed_ranges(self) -> Generator[range, None, None]:
         return (
-            seed
-            for (start, width) in batched(self.seeds, 2)
-            for seed in range(start, start + width)
+            range(start, start + width) for (start, width) in batched(self.seeds, 2)
         )
 
     @classmethod
@@ -106,6 +136,10 @@ class Farm:
         )
 
 
+def first_num_in_ranges(gen: Generator[range, None, None]) -> int:
+    return min((r.start for r in gen))
+
+
 def solve_1():
     with open("day05/input.txt", "r") as file:
         farm = Farm.from_multiline(text(file))
@@ -116,5 +150,6 @@ def solve_1():
 def solve_2():
     with open("day05/input.txt", "r") as file:
         farm = Farm.from_multiline(text(file))
-        locations = farm.seed_ranges_to_location()
-        print(f"Day 05 Part 2: {min(locations)}")
+        locations = farm.seed_ranges_to_location_ranges()
+
+        print(f"Day 05 Part 2: {first_num_in_ranges(locations)}")

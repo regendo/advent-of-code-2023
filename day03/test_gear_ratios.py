@@ -1,4 +1,3 @@
-from math import prod
 import unittest
 from day03.gear_ratios import Schematic
 
