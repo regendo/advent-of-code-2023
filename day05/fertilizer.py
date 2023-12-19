@@ -16,6 +16,9 @@ class RangeMap:
     def source_stop(self) -> int:
         return self.source_start + self.width
 
+    def dest_stop(self) -> int:
+        return self.dest_start + self.width
+
     def try_map(self, num: int) -> Optional[int]:
         off = num - self.source_start
         if off >= 0 and off < self.width:
@@ -29,9 +32,9 @@ class RangeMap:
             case (int(start), int(stop)):
                 return range(start, stop + 1)
             case (None, int(stop)):
-                return range(self.source_start, stop + 1)
+                return range(self.dest_start, stop + 1)
             case (int(start), None):
-                return range(start, self.source_stop())
+                return range(start, self.dest_stop())
             case (_, _):
                 return None
 
