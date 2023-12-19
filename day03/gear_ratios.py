@@ -34,7 +34,7 @@ class EnginePart:
 
         Note that these aren't validated in any way; they might not even have valid coordinates that fall within the bounds of the schematic.
         """
-        box = set()
+        box: Set[Pos] = set()
 
         # left bar
         box.add(Pos(self.start.x - 1, self.start.y - 1))

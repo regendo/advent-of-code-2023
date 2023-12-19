@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import re
-from typing import List, Set, Tuple
+from typing import List, Set
 from typing_extensions import Self
 
 from helpers.parsing import map_lines

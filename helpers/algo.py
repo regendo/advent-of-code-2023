@@ -6,7 +6,7 @@ T = TypeVar("T")
 
 def batched(it: Iterable[T], width: int) -> Generator[List[T], None, None]:
     """Because `itertools.batched` requires python3.12"""
-    batch = []
+    batch: list[T] = []
 
     for elem in iter(it):
         batch.append(elem)

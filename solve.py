@@ -1,6 +1,6 @@
 import day01.trebuchet
 import day02.cube_conundrum
-import day03.gear_ratios
+import day03.gear_ratios  # type: ignore
 import day04.scratchcards
 import day05.fertilizer
 
